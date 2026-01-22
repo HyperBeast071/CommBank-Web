@@ -11,6 +11,11 @@ import { selectGoalsMap, updateGoal as updateGoalRedux } from '../../../store/go
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import DatePicker from '../../components/DatePicker'
 import { Theme } from '../../components/Theme'
+import GoalIcon from './GoalIcon'
+import { Picker } from "emoji-mart"
+import "emoji-mart/css/emoji-mart.css"
+import { EmojiData } from "emoji-mart"
+
 
 type Props = { goal: Goal }
 export function GoalManager(props: Props) {
@@ -21,6 +26,7 @@ export function GoalManager(props: Props) {
   const [name, setName] = useState<string | null>(null)
   const [targetDate, setTargetDate] = useState<Date | null>(null)
   const [targetAmount, setTargetAmount] = useState<number | null>(null)
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
 
   useEffect(() => {
     setName(props.goal.name)
@@ -75,6 +81,21 @@ export function GoalManager(props: Props) {
     }
   }
 
+  const updateIcon = (emoji: EmojiData) => {
+  if (!("native" in emoji)) return
+
+  const updatedGoal: Goal = {
+    ...props.goal,
+    icon: emoji.native,
+  }
+
+  dispatch(updateGoalRedux(updatedGoal))
+  updateGoalApi(goal.id, updatedGoal)
+  setShowEmojiPicker(false)
+}
+
+
+
   return (
     <GoalManagerContainer>
       <NameInput value={name ?? ''} onChange={updateNameOnChange} />
@@ -106,7 +127,32 @@ export function GoalManager(props: Props) {
           <StringValue>{new Date(props.goal.created).toLocaleDateString()}</StringValue>
         </Value>
       </Group>
+
+      <Group>
+  <Field name="Icon" icon={faCalendarAlt} />
+  <Value>
+    <button
+      type="button"
+      onClick={() => setShowEmojiPicker(prev => !prev)}
+      style={{ fontSize: "1.5rem" }}
+    >
+      {props.goal.icon ?? "Add Icon"}
+    </button>
+
+    {showEmojiPicker && (
+      <div style={{ position: "absolute", zIndex: 1000 }}>
+        <Picker onSelect={updateIcon} />
+      </div>
+    )}
+  </Value>
+</Group>
+
+
+
+
     </GoalManagerContainer>
+
+       
   )
 }
 
