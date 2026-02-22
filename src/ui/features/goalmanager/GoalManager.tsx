@@ -90,7 +90,7 @@ export function GoalManager(props: Props) {
   }
 
   dispatch(updateGoalRedux(updatedGoal))
-  updateGoalApi(goal.id, updatedGoal)
+  updateGoalApi(props.goal.id, updatedGoal)
   setShowEmojiPicker(false)
 }
 
